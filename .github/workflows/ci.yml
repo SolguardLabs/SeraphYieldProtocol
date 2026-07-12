@@ -35,7 +35,7 @@ jobs:
         run: forge install foundry-rs/forge-std@v1.9.6 --no-git --shallow
 
       - name: Cache Foundry artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             cache
