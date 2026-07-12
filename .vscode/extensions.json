@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "editorconfig.editorconfig",
+    "juanblanco.solidity",
+    "tamasfe.even-better-toml"
+  ]
+}
