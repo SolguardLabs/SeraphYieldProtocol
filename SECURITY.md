@@ -1,62 +1,32 @@
-# Política de seguridad
+# Política de seguridad de SeraphYieldProtocol
 
-La seguridad de SeraphYieldProtocol depende tanto del código como de su configuración y operación.
-Agradecemos los informes responsables que permitan evaluar cualquier comportamiento inesperado sin
-poner en riesgo a usuarios ni despliegues.
+## Límites de confianza
 
-## Versiones cubiertas
+El vault custodia el activo y controla mint, burn, retiros y harvest. El router solo recibe órdenes autorizadas del vault; las estrategias se registran y limitan individualmente. `RiskController` fija límites de depósito, cola, shares activos, caja mínima y pérdidas reportadas. `FeeController` limita tasas y destinatario. El guardián puede restringir operaciones; la reanudación y la ampliación de límites requieren autoridad de gobierno según el módulo.
 
-Mientras el proyecto permanezca en desarrollo, solo la revisión más reciente de la rama principal
-recibe correcciones. Las ramas, etiquetas o forks anteriores no se consideran mantenidos salvo que
-se indique expresamente.
+```mermaid
+flowchart TD
+    A[Entrada de usuario] --> B{Vault y riesgo}
+    B -->|admitida| C[Shares y cola]
+    B -->|rechazada| X[Reversión]
+    C --> D{Operación autorizada}
+    D -->|sí| E[Router o distribuidor]
+    D -->|no| X
+    E --> F[Eventos y estado observable]
+```
 
-## Cómo informar de forma privada
+## Revisión de invariantes
 
-Utilice la opción **Report a vulnerability** de la pestaña **Security** del repositorio para crear
-un aviso privado de GitHub. Si esa opción no está disponible, contacte de forma privada con los
-mantenedores antes de compartir detalles técnicos.
+- El suministro de shares corresponde a las posiciones emitidas y quemadas.
+- Las shares bloqueadas no son transferibles; la cola conserva su estado hasta cancelación o ejecución.
+- El patrimonio del vault se calcula como caja más deuda contabilizada del router.
+- Los reportes de estrategias respetan límites de pérdida y caps configurados.
+- Las tarifas no exceden los límites del controlador.
+- Los rewards financiados y los pagos se observan por separado.
+- Una lente de lectura no autoriza movimientos ni cambia estado.
 
-Incluya, cuando sea posible:
+Los controles agregados no sustituyen pruebas de secuencias operativas completas. Para un cambio económico, compruebe transiciones intermedias además del resultado final.
 
-- versión, commit y configuración afectados;
-- descripción del comportamiento observado y del esperado;
-- pasos mínimos y deterministas para reproducirlo;
-- impacto estimado y supuestos necesarios;
-- prueba de concepto o prueba automatizada;
-- propuesta de corrección, si dispone de ella.
+## Avisos privados
 
-No incluya claves privadas, frases semilla, credenciales, datos personales ni fondos reales en el
-informe o en la reproducción.
-
-## Coordinación
-
-Los mantenedores intentarán confirmar la recepción en un plazo de tres días laborables. Después se
-evaluarán alcance y prioridad, se preparará una corrección y se acordará con el informante una fecha
-de divulgación. Los tiempos pueden variar según la complejidad y el riesgo operativo.
-
-Hasta que exista una solución publicada:
-
-- no abra issues, pull requests o conversaciones públicas con detalles explotables;
-- no pruebe el comportamiento sobre redes o contratos de terceros;
-- limite la demostración a entornos locales o forks controlados;
-- conserve de forma confidencial los artefactos de reproducción.
-
-## Alcance orientativo
-
-Son especialmente relevantes los problemas que puedan afectar a:
-
-- custodia, retiros o disponibilidad de activos;
-- emisión, quema o valoración de participaciones;
-- distribución de recompensas y cobro de comisiones;
-- permisos, pausas y cambios de configuración;
-- integración, valoración o liquidación de estrategias;
-- denegación de servicio persistente o incumplimiento de invariantes económicas.
-
-Los errores puramente informativos, recomendaciones de estilo y problemas que solo existen en una
-configuración explícitamente no soportada pueden tratarse mediante el flujo normal de contribución.
-
-## Puerto seguro
-
-La investigación de buena fe debe evitar perjuicios, proteger la privacidad y limitarse a activos
-propios o expresamente autorizados. Esta política no concede permiso para interactuar con sistemas
-de terceros, degradar servicios ni acceder a información ajena.
+Utilice el canal privado **Report a vulnerability** de GitHub si está habilitado. Incluya commit, parámetros, reproducción mínima, resultado esperado y observado e impacto. No incluya claves, datos personales o fondos reales; no publique detalles técnicos antes de coordinar una corrección. Esta política no autoriza probar sistemas de terceros.
